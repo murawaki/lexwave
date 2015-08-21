@@ -1,0 +1,28 @@
+
+Extract Japonic lexical data from supplimentary data of Lee and Hasegawa (2011) and save the result as janapese.nex
+
+
+run BEAUTi (GUI) to create the comfiguration file japanese.xml from japanese.nex
+
+% java -jar ~/download/BEASTv1.8.2/lib/beauti.jar
+
+
+run BEAST to generate japanese.trees
+
+% ~/local/jdk1.8.0_60/bin/java -Djava.library.path="/home/murawaki/local/lib" -jar ~/download/BEASTv1.8.2/lib/beast.jar -overwrite japanese.xml
+
+
+run FigTree (GUI) and export japanese.trees as japonic_trees.nex
+
+% java -jar ~/download/FigTree_v1.4.2/lib/figtree.jar
+
+
+select one tree and convert it to a Python data structure
+NOTE: the zero-based numbering: 84 in the command-line argument corresponds to the 85th tree
+
+% python parse_tree.py data/japonic_pca/japonic_trees.nex 84 data/japonic_pca/japonic_one.pkl
+
+
+perform PCA and plot the result
+
+% python pca_tree.py data/japonic_pca/japonic_one.pkl data/japonic_pca/japonic_one1-2.png
