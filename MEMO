@@ -26,3 +26,18 @@ NOTE: the zero-based numbering: 84 in the command-line argument corresponds to t
 perform PCA and plot the result
 
 % python pca_tree.py data/japonic_pca/japonic_one.pkl data/japonic_pca/japonic_one1-2.png
+
+
+
+
+
+python pca_kde.py data/japonic_pca/japonic_trees.nex japanese 84 Hateruma:Hirara:Ikema:Irabu:Ishigaki:Naze:Okinawa:Taketomi:Tarama:Yonaguni
+
+python pca_kde.py data/japonic_pca/japonic_trees.nex japanese 84 ROOT
+
+python pca_kde.py data/japonic_pca/japonic_trees.nex japanese 84 Aichi:Akita:Aomori:Chiba:Ehime:Fukui:Fukuoka:Fukushima:Gifu:Gunma:Hachijo:Hiroshima:Hokkaido:Hyogo:Ibaraki:Ishikawa:Iwate:Kagawa:Kagoshima:Kanagawa:Kochi:Kumamoto:Kyoto:Mie:Miyagi:Miyazaki:Nagano:Nagasaki:Nara:Niigata:Oita:Okayama:Osaka:Saga:Saitama:Shiga:Shimane:Shizuoka:Tochigi:Tokushima:Tokyo:Tottori:Toyama:Wakayama:Yamagata:Yamaguchi:Yamanashi
+
+python pca_kde.py data/ainu_pca/ainu_trees.nex Ainu_UCLD_GRRW_SDollo 215 ROOT
+python pca_kde.py data/ainu_pca/ainu_trees.nex Ainu_UCLD_GRRW_SDollo 215 Asahikawa:Bihoro:Hiratori:Horobetsu:Kushiro:Nayoro:Niikappu:Nukkibetsu:Obihiro:Oshamambe:Samani:Soya:Yakumo
+
+

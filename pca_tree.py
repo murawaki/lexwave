@@ -5,13 +5,14 @@ import numpy as np
 
 from parse_tree import Node
 
-def extract_mat(root):
+def extract_mat(root, k):
+    # if full == False: only leaves are extracted
     mat_orig = {}
     stack = [root]
     size = -1
     while len(stack) > 0:
         node = stack.pop(0)
-        vect = map(lambda x: int(x), node.annotation['&japanese'][2:-1])
+        vect = map(lambda x: int(x), node.annotation["&" + k][2:-1])
         size = len(vect)
         mat_orig[node._id] = vect
         if hasattr(node, "left"):
@@ -22,12 +23,36 @@ def extract_mat(root):
         mat[_id] = vect
     return mat
 
+def extract_mat_leaves(root, k):
+    # if full == False: only leaves are extracted
+    mat_orig = {}
+    id2idx = {}
+    stack = [root]
+    size = -1
+    while len(stack) > 0:
+        node = stack.pop(0)
+        if hasattr(node, "left"):
+            stack.append(node.left)
+            stack.append(node.right)
+        else:
+            vect = map(lambda x: int(x), node.annotation["&" + k][2:-1])
+            size = len(vect)
+            idx = id2idx[node._id] = len(id2idx)
+            mat_orig[idx] = vect
+    mat = np.empty((len(mat_orig), size), dtype=np.int32)
+    for idx, vect in mat_orig.iteritems():
+        mat[idx] = vect
+    return mat, id2idx
+
 def do_pca(X):
     pca = PCA()
     pca = PCA()
     U, S, V = pca._fit(X)
     X_transformed = np.dot(X - pca.mean_, pca.components_.T)
     return pca, X_transformed
+
+def do_pca_new(pca, X):
+    return np.dot(X - pca.mean_, pca.components_.T)
 
 def plot_rec(node, X_transformed, plt, p1, p2):
     _id = node._id
@@ -61,9 +86,11 @@ def plot_rec(node, X_transformed, plt, p1, p2):
                      xytext=(x + 0.10, y + 0.05))
 
 def main():
+    # usage: input key [output]
+    #   key: japanese, Ainu_UCLD_GRRW_SDollo, Koreanic_CovUCLD
     import cPickle as pickle
     root = pickle.load(open(sys.argv[1]))
-    X = extract_mat(root)
+    X = extract_mat(root, sys.argv[2])
     pca, X_transformed = do_pca(X)
 
     import matplotlib.pyplot as plt
@@ -75,8 +102,8 @@ def main():
     plot_rec(root, X_transformed, plt, p1, p2)
     plt.legend()
     plt.title('PCA')
-    if len(sys.argv) > 2:
-        plt.savefig(sys.argv[2], format="png", transparent=True)
+    if len(sys.argv) > 3:
+        plt.savefig(sys.argv[3], format="png", transparent=True)
     plt.show()
 
 

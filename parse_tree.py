@@ -7,6 +7,25 @@ import re
 
 from nexus import NexusReader
 
+def label_clades(node):
+    clade_dict = {}
+    def _label_clades_main(node):
+        if hasattr(node, "left"):
+            label_list = _label_clades_main(node.left) + _label_clades_main(node.right)
+            label_list.sort()
+            node.clade = ":".join(label_list)
+        if not hasattr(node, "parent"): # root
+            node.clade = "ROOT"
+            label_list = [node.clade]
+        elif hasattr(node, "name"):
+            # named nodes including leaves
+            node.clade = node.name
+            label_list = [node.clade]
+        clade_dict[node.clade] = node
+        return label_list
+    _label_clades_main(node)
+    return clade_dict
+
 class Node(object):
     def __init__(self, _id):
         self._id = _id
