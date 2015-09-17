@@ -27,6 +27,7 @@ def extract_mat_leaves(root, k):
     # if full == False: only leaves are extracted
     mat_orig = {}
     id2idx = {}
+    idx2node = {}
     stack = [root]
     size = -1
     while len(stack) > 0:
@@ -38,11 +39,12 @@ def extract_mat_leaves(root, k):
             vect = map(lambda x: int(x), node.annotation["&" + k][2:-1])
             size = len(vect)
             idx = id2idx[node._id] = len(id2idx)
+            idx2node[idx] = node
             mat_orig[idx] = vect
     mat = np.empty((len(mat_orig), size), dtype=np.int32)
     for idx, vect in mat_orig.iteritems():
         mat[idx] = vect
-    return mat, id2idx
+    return mat, id2idx, idx2node
 
 def do_pca(X):
     pca = PCA()
@@ -90,20 +92,45 @@ def main():
     #   key: japanese, Ainu_UCLD_GRRW_SDollo, Koreanic_CovUCLD
     import cPickle as pickle
     root = pickle.load(open(sys.argv[1]))
+    use_internal = False
+
     X = extract_mat(root, sys.argv[2])
-    pca, X_transformed = do_pca(X)
+    if use_internal:
+        pca, X_transformed = do_pca(X)
+    else:
+        Y, id2idx, idx2node = extract_mat_leaves(root, sys.argv[2])
+        pca, Y_transformed = do_pca(Y)
+        X_transformed = do_pca_new(pca, X)
+
+        # OJ
+        p1 = 0
+        k = 'OJ'
+        t = 0
+        d = {}
+        for idx, node in idx2node.iteritems():
+            d[idx] = Y_transformed[idx][p1]
+            if node.name == k:
+                t = Y_transformed[idx][p1]
+        sidx = sorted(idx2node.keys(), key=lambda x: abs(d[x] - t))
+        for idx in sidx:
+            sys.stdout.write("%s\t%f\n" % (idx2node[idx].name, d[idx] - t))
+        exit(0)
 
     import matplotlib.pyplot as plt
     p1, p2 = 0, 1  # first and second PCs (zero-based numbering)
 
-    plt.figure()
+    plt.figure(figsize=(8, 6), dpi=120)
     plt.xlabel("PC%d (%2.1f%%)" % (p1 + 1, pca.explained_variance_ratio_[p1] * 100))
     plt.ylabel("PC%d (%2.1f%%)" % (p2 + 1, pca.explained_variance_ratio_[p2] * 100))
     plot_rec(root, X_transformed, plt, p1, p2)
     plt.legend()
-    plt.title('PCA')
+    # plt.title('PCA')
+
+    # plt.xlim([-2.5, 1.5])
+    # plt.ylim([-1.5, 2.5])
+
     if len(sys.argv) > 3:
-        plt.savefig(sys.argv[3], format="png", transparent=True)
+        plt.savefig(sys.argv[3], format="png", transparent=False, dpi=160)
     plt.show()
 
 

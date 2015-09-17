@@ -40,7 +40,7 @@ def main():
         vect = map(lambda x: int(x), clade.annotation["&" + k][2:-1])
         clade_vect_list.append(vect)
         if i == tid:
-            X, id2idx = extract_mat_leaves(root, k)
+            X, id2idx, idx2node = extract_mat_leaves(root, k)
             pca, X_transformed = do_pca(X)
 
             # plt.figure()
